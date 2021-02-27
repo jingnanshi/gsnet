@@ -137,3 +137,4 @@ dmypy.json
 # Cython debug symbols
 cython_debug/
 
+./reference_code/GSNet-release/detectron2.egg-info
