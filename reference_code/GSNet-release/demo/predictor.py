@@ -6,6 +6,7 @@ from collections import deque
 import cv2
 import torch
 import os
+import numpy as np
 
 from detectron2.data import MetadataCatalog
 from detectron2.engine.defaults import DefaultPredictor
@@ -95,6 +96,7 @@ class VisualizationDemo(object):
                 output_mesh_dir = './inference_val_mesh/'
                 output_cls_dir = './inference_val_cls/'
                 output_score_dir = './inference_val_score/'
+                output_kpts_dir = "./inference_val_keypoints"
 
                 save_name = save_name.split('/')[1]
                 template_path = './merge_mean_car_shape/'
@@ -110,7 +112,6 @@ class VisualizationDemo(object):
                         data['translation'] = list(instances.predict_trans[index].cpu().detach().numpy().astype(float))
                         json.dump(data, f)
 
-                       
                 for index in range(instances.predict_rotation.shape[0]):
                      with open(os.path.join(output_rotation_dir, save_name +'_' +str(index)+'.json'),'w') as f:
                         data = {}
@@ -122,6 +123,11 @@ class VisualizationDemo(object):
                         data = {}
                         data['car_id'] = int(instances.pred_classes[index].cpu().detach().numpy().astype(float))
                         json.dump(data, f)
+
+                # output inferenced keypoints (in a npy file)
+                with open(os.path.join(output_kpts_dir, save_name + '.npy'),'wb') as f:
+                    data = instances.pred_keypoints.cpu().detach().numpy().astype(float)
+                    np.save(f, data)
 
                 for index in range(instances.scores.shape[0]):
                      with open(os.path.join(output_score_dir, save_name +'_' +str(index)+'.json'),'w') as f:
